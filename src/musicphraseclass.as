@@ -37,6 +37,8 @@ package {
 			
 			recordfilter = 0;
 			topnote = -1; bottomnote = 250;
+			
+			hash = 0;
 		}
 		
 		public function findtopnote():void {
@@ -57,6 +59,17 @@ package {
 			}
 		}
 		
+		public function transpose(amount:int):void {
+			for (var i:int = 0; i < numnotes; i++) {
+				if (notes[i].x != -1) {
+					if (control.invertpianoroll[notes[i].x] + amount != -1) {
+						notes[i].x = control.pianoroll[control.invertpianoroll[notes[i].x] + amount];
+					}
+				}
+				if (notes[i].x < 0) notes[i].x = 0;
+				if (notes[i].x > 104) notes[i].x = 104;
+			}
+		}
 		
 		public function addnote(noteindex:int, note:int, time:int):void {
 			if (numnotes < 128) {
@@ -66,8 +79,9 @@ package {
 			
 			if (note > topnote) topnote = note;
 			if (note < bottomnote) bottomnote = note;
-			notespan = topnote-bottomnote;
-			//trace("added note index ", numnotes - 1, ": position: ", noteindex, ", note: ", note, ", length: ", time);
+			notespan = topnote - bottomnote;
+			
+			hash = (hash + (note * time)) % 2147483647;
 		}
 		
 		public function noteat(noteindex:int, note:int):Boolean {
@@ -129,5 +143,7 @@ package {
 		public var palette:int;
 		
 		public var isplayed:Boolean;
+		
+		public var hash:int; //massively simplified thing
 	}
 }
